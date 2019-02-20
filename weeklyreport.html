@@ -1,0 +1,141 @@
+{% extends 'layout.html' %} {% block content %}
+<nav>
+    <div class="nav-wrapper black">
+        <a href="" class="brand-logo"><img class="responsive-img" height="10%" width="10%" src="https://upload.wikimedia.org/wikipedia/en/thumb/5/5e/Oakridge_International_School_Logo.png/800px-Oakridge_International_School_Logo.png" alt="logo" /></a>
+        <ul id="nav-mobile" class="right hide-on-med-and-down">
+            <li><a href ="/">Home</a></li>
+            <li><a href="/logout">Log Out</a></li>
+
+        </ul>
+    </div>
+</nav>
+<div class="container">
+    <div class="container">
+        <div class="row">
+            <div class="col s12">
+                <h3>Weekly report</h3>
+            </div>
+        </div>
+        <hr>
+
+        <div class="row">
+            <p class="flow-text">Select Grade and Section</p>
+
+            <div class="input-field col s12">
+                <select id="gsSelect">
+                {% for item in data.get('allclasses') %}
+                    <option value="{{ item.get('grade') }},{{ item.get('section') }}">{{ item.get('grade') }} {{ item.get('section') }}</option>
+                {% endfor %}
+            </select>
+            </div>
+
+        </div>
+
+
+        <div class="row">
+            <p class="flow-text">Choose a date:</p>
+            <br>
+            <input id="datepickerelem" type="text" class="datepicker">
+            <br>
+            <a class="btn teal waves-effect" onclick="getAttendanceGraph()">Get attendance graph</a>
+        </div>
+        
+        <div class="row">
+            <p id="total_count" class="flow-text"></p>
+        </div>
+        
+        <div class="row">
+          <canvas id="myChart" width="400" height="400"></canvas>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $('.datepicker').datepicker({
+        firstDay: 0
+    });
+    $('select').formSelect();
+
+    function getAttendanceGraph() {
+        var date = document.getElementById('datepickerelem').value;
+        var e = document.getElementById("gsSelect");
+        var gradeAndSection = e.options[e.selectedIndex].value;
+        console.log(gradeAndSection);
+
+        var grade = gradeAndSection.split(",")[0];
+        var section = gradeAndSection.split(",")[1];
+
+        console.log(date);
+        if (date) {
+            var data = {
+                "grade": grade,
+                "section": section,
+                "date": date
+            }
+            $.ajax({
+                type: "POST",
+                url: '/attendanceGraph',
+                data: JSON.stringify(data),
+                contentType: 'application/json',
+                dataType: 'json',
+                success: function(return_data) {
+                    myChart.data.datasets[0].data = return_data.data;
+                    myChart.update();
+                    document.getElementById('total_count').textContent = `Total students: ${return_data.total_count}`;
+                }
+            });
+        }
+        else {
+            M.toast({ html: '<p class="flow-text">No date specified</p>' })
+        }
+    };
+</script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.js"></script>
+<script type="text/javascript">
+    
+var attendance = document.getElementById("attendance_number");
+var ctx = document.getElementById("myChart").getContext('2d');
+var myChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+        datasets: [{
+            label: 'Number of students present',
+            data: [],
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(54, 162, 235, 0.2)',
+                'rgba(255, 206, 86, 0.2)',
+                'rgba(75, 192, 192, 0.2)',
+                'rgba(153, 102, 255, 0.2)',
+                'rgba(255, 159, 64, 0.2)'
+            ],
+            borderColor: [
+                'rgba(255,99,132,1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(75, 192, 192, 1)',
+                'rgba(153, 102, 255, 1)',
+                'rgba(255, 159, 64, 1)'
+            ],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        legend: { display: false },
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero: true
+                }
+            }]
+        },
+        title: {
+            display: true,
+            text: 'Attendance'
+        }
+    }
+});
+</script>
+{% endblock %}

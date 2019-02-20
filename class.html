@@ -1,0 +1,143 @@
+{% extends 'layout.html' %} {% block content %}
+<nav>
+    <div class="nav-wrapper black">
+        <a href="#" class="brand-logo"><img class="responsive-img" height="10%" width="10%" src="https://upload.wikimedia.org/wikipedia/en/thumb/5/5e/Oakridge_International_School_Logo.png/800px-Oakridge_International_School_Logo.png" alt="logo" /></a>
+        <ul id="nav-mobile" class="right hide-on-med-and-down">
+           <li><a href="/">Home</a></li>
+
+           <li><a href="/weeklyreport">Weekly Report</a></li>
+            <li><a href="/logout">Log Out</a></li>
+        </ul>
+    </div>
+</nav>
+<br>
+<br>
+
+
+
+<div class="container">
+    <div class="row">
+        <div class="col s12">
+            <p class="flow-text">{{ data.get('grade') }}th {{ data.get('section') }} data</p>
+        </div>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col s12">
+            <ul class="tabs">
+                <li class="tab col s4"><a class="active" href="#students">All Students</a></li>
+                <li class="tab col s4"><a href="#attendance">Attendance for Today</a></li>
+                <li class="tab col s4"><a href="#date">Attendance on Certain Dates</a></li>
+            </ul>
+        </div>
+        <div id="students" class="col s12">
+            <div class="row">
+                <table class="striped">
+                    <thead>
+                        <tr>
+                            <th>Class</th>
+                            <th>Reg. no</th>
+                            <th>Name</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for entry in data.get('class_data') %}
+                        <tr>
+                            <td>{{ entry.class }}</td>
+                            <td>{{ entry.regno }}</td>
+                            <td>{{ entry.name }}</td>
+                            <td>{{ entry.attendanceVal }}</td>
+                        </tr>
+                        {% endfor %}
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div id="attendance" class="col s12">
+            <div class="row">
+                <table class="striped">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Reg. no</th>
+                            <th>Attendance Status</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for entry in data.get('attendance_data') %}
+                        <tr>
+                            <td>{{ entry.name }}</td>
+                            <td>{{ entry.student_id }}</td>
+                            <td>{{ entry.attendanceVal }}</td>
+                            <td>{{ entry.date }}</td>
+                        </tr>
+                        {% endfor %}
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div id="date" class="col s12">
+            <p class="flow-text">Choose a date:</p>
+            <br>
+            <input id="datepickerelem" type="text" class="datepicker">
+            <br>
+            <a class="btn teal waves-effect" onclick="getDateRecords({{ data.get('grade') }}, '{{ data.get('section') }}')">Get attendance records</a>
+            <table class="striped">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Reg. no</th>
+                        <th>Attendance Status</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+
+                <tbody id="recordsBody">
+                    
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $('.tabs').tabs();
+    $('.datepicker').datepicker();
+
+    function getDateRecords(grade, section) {
+        var date = document.getElementById('datepickerelem').value;
+        console.log(date);
+        if (date) {
+            var data = {
+                "grade": grade,
+                "section": section,
+                "date": date
+            }
+            $.ajax({
+                type: "POST",
+                url: '/getDateRecords',
+                data: data,
+                contentType: 'application/json',
+                dataType: 'json',
+                success : function(data){
+                    document.getElementById('recordsBody').innerHTML = '';
+                    console.log(data);
+                    for(let obj of data)
+                    {
+                        var elem_html = `<tr><td>${obj.name}</td><td>${obj.student_id}</td><td>${obj.attendanceVal}</td><td>${obj.date}</td></tr>`;
+                        document.getElementById('recordsBody').insertAdjacentHTML('beforeend', elem_html);
+                    }
+                }
+            });
+        }
+        else {
+            M.toast({ html: '<p class="flow-text">No date specified</p>' })
+        }
+    };
+</script>
+{% endblock %}

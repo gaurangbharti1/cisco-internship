@@ -1,0 +1,91 @@
+{% extends 'layout.html' %} {% block content %}
+<link rel="stylesheet" href="Static/style.css">
+<nav>
+    <div class="nav-wrapper black">
+        <a href="#" class="brand-logo"><img class="responsive-img" height="10%" width="10%" src="https://imgur.com/a/o6KBXQK" alt="logo"/></a>
+                <a href="#" class="brand-logo"><img class="responsive-img" height="10%" width="10%" src="https://upload.wikimedia.org/wikipedia/en/thumb/5/5e/Oakridge_International_School_Logo.png/800px-Oakridge_International_School_Logo.png" alt="logo" /></a>
+
+        <ul id="nav-mobile" class="right hide-on-med-and-down">
+            
+          
+            <li><a href="/weeklyreport">Weekly Report</a></li>
+            <li><a href="/logout">Log Out</a></li>
+        </ul>
+    </div>
+</nav>
+<div class="container">
+    <div class="row center-align">
+        <div class="col s12">
+            <h1>Oakridge Attendance System</h1>
+            <br>
+            <br>
+        </div>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col s12 center-align">
+            <style>
+                p {font-size: 15px;
+    line-height: 21px;
+}
+            </style>
+            <p class="flow-text thin" style="font-size: 28px"><b><i>Welcome, Teacher</i></b></p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col s12">
+            <p style="font-size: 17px;
+">Oakridge Attendance System allows teachers to view the attendance status of students from the secondary section. 
+            The system also generates a weekly bar graph consisting of the attendance status of a particular class for a particular week.
+              </p>
+        </div>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col s12 left-align">
+            <br>
+            <br>
+            
+            <p class="flow-text thin"><i>Choose your class</i></p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col s12">
+            <a href="#" class="btn waves-effect hoverable dropdown-trigger" data-target='9thGradeDropdown'>9th grade</a>
+            <a href="#" class="btn waves-effect hoverable dropdown-trigger" data-target='10thGradeDropdown'>10th grade</a>
+            <a href="#" class="btn waves-effect hoverable dropdown-trigger" data-target='11thGradeDropdown'>11th grade</a>
+            <a href="#" class="btn waves-effect hoverable dropdown-trigger" data-target='12thGradeDropdown'>12th grade</a>
+        </div>
+    </div>
+</div>
+
+<ul id='9thGradeDropdown' class='dropdown-content'>
+    {% for item in classes_data.get('9') %}
+    <li><a href="./gradeData?grade=9&section={{ item }}">{{ item }}</a></li>
+    {% endfor %}
+</ul>
+
+<ul id='10thGradeDropdown' class='dropdown-content'>
+    {% for item in classes_data.get('10') %}
+    <li><a href="./gradeData?grade=10&section={{ item }}">{{ item }}</a></li>
+    {% endfor %}
+</ul>
+
+<ul id='11thGradeDropdown' class='dropdown-content'>
+    {% for item in classes_data.get('11') %}
+    <li><a href="./gradeData?grade=11&section={{ item }}">{{ item }}</a></li>
+    {% endfor %}
+</ul>
+
+<ul id='12thGradeDropdown' class='dropdown-content'>
+    {% for item in classes_data.get('12') %}
+    <li><a href="./gradeData?grade=12&section={{ item }}">{{ item }}</a></li>
+    {% endfor %}
+</ul>
+
+<script type="text/javascript">
+    $('.dropdown-trigger').dropdown({
+        'coverTrigger': false
+    });
+</script>
+{% endblock %}
